@@ -1,0 +1,213 @@
+<html>
+<head>
+<title>Motion parameters</title>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+<script type="text/javascript" src="http://d3js.org/colorbrewer.v1.min.js"></script>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+<h1 style="margin: 50px 20px 20px 50px;">Motion parameters</h1>
+<script type="text/javascript">
+// Based on:
+// https://bl.ocks.org/mbostock/3884955
+// https://bl.ocks.org/mbostock/3902569
+// http://bl.ocks.org/benlcollins/2d7fb36cd0c295c00882
+var margin = {top: 20, right: 50, bottom: 30, left: 50},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var bisectGraph = d3.bisector(function(d) { return d.time; }).left;
+
+var x = d3.scale.linear()
+    .range([0, width-80]);
+
+var y = d3.scale.linear()
+	.domain([-0.5, 0.5])
+    .range([height, 0]);
+
+var color = d3.scale.ordinal()
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
+
+var line = d3.svg.line()
+    .interpolate("basis")
+    .x(function(d) { return x(d.time); })
+    .y(function(d) { return y(d.motion); });
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var focus = svg.append("g").style("display","none");
+    focus.append("text")
+      .attr("x", 9)
+      .attr("dy", ".35em");
+
+$().ready(function() {
+data = {{ data|safe }};
+updateChart(data);
+});
+
+function updateChart(data) {
+	color.domain(d3.keys(data[0]).filter(function(key) { return key !== "date"; }));
+
+
+	color.domain(d3.keys(data[0]).filter(function(key) { return key !== "time"; }));
+
+	  var motparams = color.domain().map(function(name) {
+	    return {
+	      name: name,
+	      values: data.map(function(d) {
+	        return {time: d.time, motion: +d[name]};
+	      })
+	    };
+	  });
+	  color.range(colorbrewer.Dark2[motparams.length]);
+
+	  x.domain(d3.extent(data, function(d) { return d.time; }));
+
+	  // y.domain([
+	  //   d3.min(motparams, function(c) { return d3.min(c.values, function(v) { return v.motion; }); }),
+	  //   d3.max(motparams, function(c) { return d3.max(c.values, function(v) { return v.motion; }); })
+			//   ]);
+
+
+	  svg.append("g")
+	      .attr("class", "x axis")
+	      .attr("transform", "translate(0," + height + ")")
+	      .call(xAxis);
+
+	  svg.append("g")
+	      .attr("class", "y axis")
+	      .call(yAxis)
+	    .append("text")
+	      .attr("transform", "rotate(-90)")
+	      .attr("y", 6)
+	      .attr("dy", ".71em")
+	      .style("text-anchor", "end")
+	      .text("Motion (mm or deg)");
+
+	// add circle at intersection
+	focus.append("circle")
+		.attr("class","y")
+		.attr("fill","none")
+		.attr("stroke","black")
+		.style("opacity",0.5)
+		.attr("r",4);
+
+	// add horizontal line at intersection
+	focus.append("line")
+		.attr("class","x")
+		.attr("stroke","black")
+		.attr("stroke-dasharray","3,3")
+		.style("opacity",0.5)
+		.attr("x1", 0)
+		.attr("x2", width);
+
+	// add vertical line at intersection
+	focus.append("line")
+		.attr("class","y")
+		.attr("stroke","black")
+		.attr("stroke-dasharray","3,3")
+		.style("opacity",0.5)
+		.attr("y1", 0)
+		.attr("y2", height);
+
+	// append rectangle for capturing if mouse moves within area
+	svg.append("rect")
+		.attr("width",width)
+		.attr("height",height)
+		.style("fill","none")
+		.style("pointer-events","all")
+		.on("mouseover", function() { focus.style("display", null); })
+		.on("mouseout", function() { focus.style("display", "none"); })
+		.on("mousemove", mousemove);
+			
+
+	  var motparam = svg.selectAll(".motparam")
+      .data(motparams)
+    .enter().append("g")
+      .attr("class", "motparam");
+
+  motparam.append("path")
+      .attr("class", "line")
+      .attr("d", function(d) { return line(d.values); })
+      .style("stroke", function(d) { return color(d.name); });
+
+  motparam.append("text")
+      .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
+      .attr("transform", function(d) { return "translate(" + x(d.value.time) + "," + y(d.value.motion) + ")"; })
+      .attr("x", 3)
+      .attr("dy", ".35em")
+      .text(function(d) { return d.name; })
+      		    .on("mouseover",function(d,i) { 
+		    	for (j=0; j < 6; j++) {
+						if (i !== j) {
+							d3.select("#id"+j).style("opacity",0.1);
+							d3.select("#text_id"+j).style("opacity",0.2);
+						}
+					};
+		    })
+		    .on("mouseout", function(d,i) {
+		    	for (j=0; j < 6; j++) {
+						d3.select("#id"+j).style("opacity",1);
+						d3.select("#text_id"+j).style("opacity",1);
+					};
+		    });
+
+			// mousemove function
+			function mousemove() {
+				var mousepos = d3.mouse(this)
+				var x0 = x.invert(mousepos[0]);
+				var y0 = y.invert(mousepos[1]);
+				var i = bisectGraph(data, x0, 1);
+				var d0 = data[i - 1], d1 = data[i];
+				
+				var d = x0 - d0.time > d1.time - x0 ? d1 : d0;
+				yclosest = closest(y0, [+d.x_trans, +d.y_trans, +d.z_trans, +d.x_rot, +d.y_rot, +d.z_rot]);
+				focus.select("circle.y")
+				.attr("transform", "translate(" + x(d.time) + "," + y(yclosest) + ")");
+
+				focus.select("line.y")
+					.attr("y2",height - y(yclosest))
+					.attr("transform", "translate(" + x(d.time) + "," 
+						+ y(yclosest) + ")");
+
+				focus.select("line.x")
+				.attr("x2",x(d.time))
+				.attr("transform", "translate(0," 
+					+ (y(yclosest)) + ")");
+
+				focus.select("text").text("time: " + d.time + ", motion: " + yclosest.toFixed(2))
+				.attr("transform", "translate(" + x(d.time) + "," + y(yclosest) + ")");
+
+			};
+
+			function closest(num, arr) {
+                var curr = arr[0];
+                var diff = Math.abs (num - curr);
+                for (var val = 0; val < arr.length; val++) {
+                    var newdiff = Math.abs (num - arr[val]);
+                    if (newdiff < diff) {
+                        diff = newdiff;
+                        curr = arr[val];
+                    }
+                }
+                return curr;
+            }
+};
+
+</script>
+</body>
+</html>

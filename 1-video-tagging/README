@@ -1,0 +1,2 @@
+The web app displays video(s) from the 'video' directory, making them available for labeling.
+After the images are tagged and the form is submitted, the results are saved as a json file ('tagged.json') in the 'data' directory.
