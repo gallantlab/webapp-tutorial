@@ -26,6 +26,7 @@ http://flask.pocoo.org/
 Hello World!
 
 $ virtualenv env
-$ . /env/bin/activate
+$ . env/bin/activate
+$ cd 0-hello-world
 $ pip install -r requirements.txt
 $ python hello-world.py
