@@ -9,31 +9,41 @@
 <h1 style="margin: 50px 20px 20px 50px;">Video labeling</h1>
 <form id="annot", role="form" method="post" action="/submitted">
 <table class="table table-bordered" style="margin-left:50px; width:800px;">
+
 <tr>
 <td>Video</td>
 <td>Info</td>
 </tr>
+
+
 {% for vid in video %}
 {% set ext = vid.split('.')[1] %}
 {% if ext == 'ogv' %}
 {% set ext = 'ogg' %}
 {% endif %}
 <tr>
+
 <td>
 {{ vid }}
 <video width="400" height="300" controls>
   <source src="/video/{{ vid }}" type="video/{{ ext }}">
 </video>
 </td>
+
+
 <td>
 <input type="checkbox" name="humans" value="1"> Humans present?
 <input type="checkbox" name="vehicles" value="1"> Vehicles present?
 <br><br>
 <textarea rows="10" cols="60" name="tags" placeholder="Tags, separate with commas"></textarea>
 </td>
+
+
 </tr>
 {% endfor %}
+
 </table>
+
 <button type="submit" class="btn btn-primary" style="margin-left:50px;">Submit</button>
 </form>
 

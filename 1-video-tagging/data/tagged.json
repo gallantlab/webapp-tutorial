@@ -1,0 +1,49 @@
+{
+  "ogv_test.ogv": {
+    "humans": true, 
+    "tags": "robot", 
+    "vehicles": true
+  }, 
+  "shortfilms_sess01val01_sec0510.mp4": {
+    "humans": true, 
+    "tags": "trains, platform", 
+    "vehicles": true
+  }, 
+  "shortfilms_sess01val01_sec0511.mp4": {
+    "humans": true, 
+    "tags": "buildings", 
+    "vehicles": true
+  }, 
+  "shortfilms_sess01val01_sec0512.mp4": {
+    "humans": true, 
+    "vehicles": true
+  }, 
+  "shortfilms_sess01val01_sec0513.mp4": {
+    "humans": true, 
+    "vehicles": true
+  }, 
+  "shortfilms_sess01val01_sec0514.mp4": {
+    "humans": true, 
+    "vehicles": true
+  }, 
+  "shortfilms_sess01val01_sec0515.mp4": {
+    "humans": true, 
+    "vehicles": true
+  }, 
+  "shortfilms_sess01val01_sec0516.mp4": {
+    "humans": true, 
+    "vehicles": true
+  }, 
+  "shortfilms_sess01val01_sec0517.mp4": {
+    "humans": true, 
+    "vehicles": true
+  }, 
+  "shortfilms_sess01val01_sec0518.mp4": {
+    "humans": true, 
+    "vehicles": true
+  }, 
+  "shortfilms_sess01val01_sec0519.mp4": {
+    "humans": true, 
+    "vehicles": true
+  }
+}

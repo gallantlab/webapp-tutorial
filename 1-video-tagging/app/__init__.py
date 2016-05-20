@@ -38,25 +38,29 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
 
     @app.route('/submitted', methods = ['GET', 'POST'])
     def submit_message():
-        video = [vid for vid in os.listdir('%s/' % app.config['VIDEO_DIR']) if vid.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']]
-        tagged_video = {}
-        form_data = request.form
-        tags = form_data.getlist("tags")
-        for i, vid in enumerate(video):
-            tagged_video[vid] = {'humans': bool(form_data.get("humans"))}
-            tagged_video[vid]['vehicles'] = bool(form_data.get("vehicles"))
-            if tags[i] != '':
-                tagged_video[vid]['tags'] = tags[i]
+        if request.method == "POST":
+            video = [vid for vid in os.listdir('%s/' % app.config['VIDEO_DIR']) if vid.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']]
+            tagged_video = {}
+            
+            form_data = request.form
 
-        if os.path.isfile(os.path.join(app.config['DATA_DIR'], app.config['DATA_FILE'])):
-            with open(os.path.join(app.config['DATA_DIR'], app.config['DATA_FILE'])) as f:
-                data = json.load(f)
-            data.update(tagged_video)
-        else:
-            data = tagged_video
+            tags = form_data.getlist("tags")
 
-        with open(os.path.join(app.config['DATA_DIR'], app.config['DATA_FILE']), 'w') as f:
-            json.dump(data, f, indent = 2, sort_keys=True)
+            for i, vid in enumerate(video):
+                tagged_video[vid] = {'humans': bool(form_data.get("humans"))}
+                tagged_video[vid]['vehicles'] = bool(form_data.get("vehicles"))
+                if tags[i] != '':
+                    tagged_video[vid]['tags'] = tags[i]
+
+            if os.path.isfile(os.path.join(app.config['DATA_DIR'], app.config['DATA_FILE'])):
+                with open(os.path.join(app.config['DATA_DIR'], app.config['DATA_FILE'])) as f:
+                    data = json.load(f)
+                data.update(tagged_video)
+            else:
+                data = tagged_video
+
+            with open(os.path.join(app.config['DATA_DIR'], app.config['DATA_FILE']), 'w') as f:
+                json.dump(data, f, indent = 2, sort_keys=True)
 
         return 'Thank you for submitting the form! The tags are <a href="/data/%s">here</a>.' % (app.config['DATA_FILE'])
 

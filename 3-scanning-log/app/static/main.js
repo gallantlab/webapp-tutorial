@@ -22,11 +22,11 @@ $('#close_copyoutput').click(function () {
 
 $('#exportbtn').click(function() {
   event.preventDefault();
-  var data = new FormData($('#scanform')[0]);
+  var formdata = new FormData($('#scanform')[0]);
   $.ajax({
         type: 'POST',
         url: '/export',
-        data: data,
+        data: formdata,
         contentType: false,
         processData: false,
         dataType: 'json'

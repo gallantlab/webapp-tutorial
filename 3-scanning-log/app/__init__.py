@@ -19,7 +19,7 @@ def create_app(config, debug=False, testing=False, config_overrides=None):
 
 	@app.route("/", methods=["GET", "POST"])
 	def logform():
-		return render_template('index.html') #, sequences = sequences)
+		return render_template('index.html')
 
 	@app.route("/export", methods=["GET", "POST"])
 	def exportform():
